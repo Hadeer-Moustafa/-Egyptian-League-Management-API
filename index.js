@@ -27,6 +27,10 @@ app.use((req, res, next) => {
     .json({ status: ERROR, message: "This resource is not found" });
 });
 
+app.use((err, req, res, next) => {
+  res.status(err.status).json({ status: ERROR, message: err.message });
+});
+
 app.listen(process.env.port, () => {
   console.log("server running");
 });
