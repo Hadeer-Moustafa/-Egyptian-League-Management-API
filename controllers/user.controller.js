@@ -38,6 +38,7 @@ const register = asyncWrapper(async (req, res) => {
   const token = await generate_jwt({ id: newUser._id, email: newUser.email });
   newUser.token = token;
   await newUser.save();
+  res.status(201).json({ status: SUCCESS, data: { user: newUser } });
 });
 
 const login = asyncWrapper(async (req, res) => {
