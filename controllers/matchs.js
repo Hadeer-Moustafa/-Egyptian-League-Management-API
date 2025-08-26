@@ -2,6 +2,7 @@ const matchs = require("../models/teams&matchs").Match;
 const e = require("express");
 const { SUCCESS, FAIL, ERROR } = require("../utilities/httpstatus");
 const asyncWrapper = require("../middleware/asyncWrapper");
+const AppError = require("../utilities/appError");
 
 const getAllMatchs = asyncWrapper(async (req, res) => {
   let quary = req.query;
@@ -15,10 +16,9 @@ const getAllMatchs = asyncWrapper(async (req, res) => {
 const getMatchById = asyncWrapper(async (req, res) => {
   const data = await matchs.findById(req.params.matchId, { __v: false });
   if (data) {
-    res.json({ status: SUCCESS, data: { match: data } });
-  } else {
-    res.status(404).json({ status: FAIL, data: { match: "match not found" } });
+    return res.json({ status: SUCCESS, data: { match: data } });
   }
+  throw AppError.create("match not found", 404, "Fail");
 });
 
 const addMatch = asyncWrapper(async (req, res) => {
@@ -35,19 +35,17 @@ const updateMatch = asyncWrapper(async (req, res) => {
   );
 
   if (data.matchedCount !== 0) {
-    res.json({ status: SUCCESS, data: data });
-  } else {
-    res.status(404).json({ status: FAIL, data: { match: "match not found" } });
+    return res.json({ status: SUCCESS, data: data });
   }
+  throw AppError.create("match not found", 404, "Fail");
 });
 
 const deleteMatch = asyncWrapper(async (req, res) => {
   const data = await matchs.deleteOne({ _id: req.params.matchId });
   if (data.deletedCount !== 0) {
-    res.json({ status: SUCCESS, data: null });
-  } else {
-    res.status(404).json({ status: FAIL, data: { match: "match not found" } });
+    return res.json({ status: SUCCESS, data: null });
   }
+  throw AppError.create("match not found", 404, "Fail");
 });
 
 module.exports = {
