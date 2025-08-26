@@ -1,36 +1,16 @@
 require("dotenv").config();
 const express = require("express");
-const { SUCCESS, FAIL, ERROR } = require("./utilities/httpstatus");
+const { apiRouter } = require("./routers/main.route");
+const notFound = require("./middleware/notFound");
+const globalErrorHandler = require("./middleware/globalErrorHandler");
 const app = express();
-
-const mongoose = require("mongoose");
-
-const url = process.env.MONGO_URL;
-
-mongoose.connect(url).then(() => {
-  console.log("MongoDB server running......");
-});
 
 app.use(express.json());
 
-const teamsRouter = require("./routers/teamsRouter");
-const matchsRouter = require("./routers/matchsRouter");
-const userRouter = require("./routers/user.routes");
+app.use("/api", apiRouter);
 
-app.use("/teams", teamsRouter);
-app.use("/matchs", matchsRouter);
-app.use("/users", userRouter);
+app.use(notFound);
 
-app.use((req, res, next) => {
-  res
-    .status(404)
-    .json({ status: ERROR, message: "This resource is not found" });
-});
+app.use(globalErrorHandler);
 
-app.use((err, req, res, next) => {
-  res.status(err.statusCode||500).json({ status: ERROR, message: err.message });
-});
-
-app.listen(process.env.port, () => {
-  console.log("server running");
-});
+module.exports = app;
