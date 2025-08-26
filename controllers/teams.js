@@ -1,7 +1,7 @@
 const teams = require("../models/teams&matchs").Team;
 const { SUCCESS, FAIL, ERROR } = require("../utilities/httpstatus");
 const asyncWrapper = require("../middleware/asyncWrapper");
-
+const AppError = require("../utilities/appError");
 const getAllTeams = asyncWrapper(async (req, res) => {
   let quary = req.query;
   const limit = quary.limit || 6;
@@ -16,10 +16,9 @@ const getTeamById = asyncWrapper(async (req, res) => {
   const data = await teams.findById(req.params.teamId, { __v: false });
 
   if (data) {
-    res.json({ status: SUCCESS, data: { team: data } });
-  } else {
-    res.status(404).json({ status: FAIL, data: { team: "team not found" } });
+    return res.json({ status: SUCCESS, data: { team: data } });
   }
+  throw AppError.create("team not found", 404, "Fail");
 });
 
 const addTeam = asyncWrapper(async (req, res) => {
@@ -36,20 +35,18 @@ const updateTeam = asyncWrapper(async (req, res) => {
   );
 
   if (data.matchedCount !== 0) {
-    res.json({ status: SUCCESS, data: data });
-  } else {
-    res.status(404).json({ status: FAIL, data: { team: "team not found" } });
+    return res.json({ status: SUCCESS, data: data });
   }
+  throw AppError.create("team not found", 404, "Fail");
 });
 
 const deleteTeam = asyncWrapper(async (req, res) => {
   const data = await teams.deleteOne({ _id: req.params.teamId });
 
   if (data.deletedCount !== 0) {
-    res.json({ status: SUCCESS, data: null });
-  } else {
-    res.status(404).json({ status: FAIL, data: { team: "team not found" } });
+    return res.json({ status: SUCCESS, data: null });
   }
+  throw AppError.create("team not found", 404, "Fail");
 });
 
 module.exports = {

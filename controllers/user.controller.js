@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const generate_jwt = require("../utilities/generate_jwt");
 const asyncWrapper = require("../middleware/asyncWrapper");
+const AppError = require("../utilities/appError");
 
 dotenv.config();
 const getAllUsers = asyncWrapper(async (req, res) => {
@@ -41,20 +42,19 @@ const register = asyncWrapper(async (req, res) => {
 
 const login = asyncWrapper(async (req, res) => {
   const { email, password } = req.body;
-  if (!email && !password) {
-    throw new Error("email and password required");
+  if (!email || !password) {
+    throw AppError.create("email and password are rquired", 404, "Fail");
   }
   const user = await User.findOne({ email: email });
   if (!user) {
-    throw new Error("user not found");
+    throw AppError.create("user not found", 404, "Fail");
   }
   const matchedPassword = await bycrypt.compare(password, user.password);
   if (user && matchedPassword) {
     const token = await generate_jwt({ id: user._id, email: user.email });
-    res.json({ status: SUCCESS, data: { token } });
-  } else {
-    throw new Error("error in email or password");
+    return res.json({ status: SUCCESS, data: { token } });
   }
+  throw AppError.create("error in email or password", 404, "Error");
 });
 
 module.exports = {

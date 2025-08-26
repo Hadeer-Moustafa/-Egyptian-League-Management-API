@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.status).json({ status: ERROR, message: err.message });
+  res.status(err.statusCode||500).json({ status: ERROR, message: err.message });
 });
 
 app.listen(process.env.port, () => {
