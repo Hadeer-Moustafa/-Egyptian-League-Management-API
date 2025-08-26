@@ -4,67 +4,59 @@ const bycrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const generate_jwt = require("../utilities/generate_jwt");
+const asyncWrapper = require("../middleware/asyncWrapper");
+const AppError = require("../utilities/appError");
+
 dotenv.config();
-const getAllUsers = (req, res) => {
+const getAllUsers = asyncWrapper(async (req, res) => {
   const quary = req.query;
   const limit = quary.limit || 6;
   const page = quary.page || 1;
   const skip = (page - 1) * limit;
-  User.find({}, { __v: false, password: false })
+  const data = await User.find({}, { __v: false, password: false })
     .limit(limit)
-    .skip(skip)
-    .then((data) => {
-      res.json({ status: SUCCESS, data: { users: data } });
-    });
-};
+    .skip(skip);
 
-const register = async (req, res) => {
-  try {
-    const {firstName, lastName, email, password } = req.body;
-    const olduser = await User.findOne({ email: req.body.email });
-    if (olduser) {
-      return res
-        .status(400)
-        .json({ status: FAIL, message: "user already exist." });
-    }
-    const hashedpassword = await bycrypt.hash(password, 10);
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedpassword,
-    });
-  const token = await generate_jwt({id:newUser._id,email:newUser.email});
+  res.json({ status: SUCCESS, data: { users: data } });
+});
+
+const register = asyncWrapper(async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+  const olduser = await User.findOne({ email: req.body.email });
+  if (olduser) {
+    return res
+      .status(400)
+      .json({ status: FAIL, message: "user already exist." });
+  }
+  const hashedpassword = await bycrypt.hash(password, 10);
+  const newUser = new User({
+    firstName,
+    lastName,
+    email,
+    password: hashedpassword,
+  });
+  const token = await generate_jwt({ id: newUser._id, email: newUser.email });
   newUser.token = token;
-    await newUser.save();
-    res.status(201).json({ status: SUCCESS, data: { user: newUser } });
-  } catch (err) {
-    res.status(400).json({ status: ERROR, message: err.message });
-  }
-};
+  await newUser.save();
+  res.status(201).json({ status: SUCCESS, data: { user: newUser } });
+});
 
-const login = async(req,res) => {
-    try{
-const {email,password}=req.body;
-if(!email && !password){
-    throw new Error("email and password required");
-}
-const user = await User.findOne({email:email});
-if(!user){
-    throw new Error("user not found");
-}
-const matchedPassword = await bycrypt.compare(password,user.password);
-if(user && matchedPassword){
-     const token = await generate_jwt({id:user._id,email:user.email});
-    res.json({status:SUCCESS,data:{token}});
-}
-else {
-    throw new Error("error in email or password");
-}
-    }catch (err) {
-    res.status(400).json({ status: ERROR, message: err.message });
+const login = asyncWrapper(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw AppError.create("email and password are rquired", 404, "Fail");
   }
-};
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    throw AppError.create("user not found", 404, "Fail");
+  }
+  const matchedPassword = await bycrypt.compare(password, user.password);
+  if (user && matchedPassword) {
+    const token = await generate_jwt({ id: user._id, email: user.email });
+    return res.json({ status: SUCCESS, data: { token } });
+  }
+  throw AppError.create("error in email or password", 404, "Error");
+});
 
 module.exports = {
   getAllUsers,
