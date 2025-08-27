@@ -5,12 +5,13 @@ const teamSchema = new mongoose.Schema({
   city: { type: String, required: true },
   stadium: { type: String, required: true },
   founded: { type: String, required: true },
+  logo: { type: String, default: "uploads/default.png" },
 });
 const matchSchema = new mongoose.Schema({
   homeTeam: { type: String, required: true },
   awayTeam: { type: String, required: true },
   date: { type: String, required: true },
-  score: { type: String, required: true },
+  score: { type: String },
 });
 
 const Team = mongoose.model("teams", teamSchema);

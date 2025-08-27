@@ -22,7 +22,14 @@ const getTeamById = asyncWrapper(async (req, res) => {
 });
 
 const addTeam = asyncWrapper(async (req, res) => {
-  const newTeam = new teams(req.body);
+  const { name, city, stadium, founded, logo } = req.body;
+  const newTeam = new teams({
+    name,
+    city,
+    stadium,
+    founded,
+    logo: req.file.filename,
+  });
 
   await newTeam.save();
   res.status(201).json({ status: SUCCESS, data: { team: newTeam } });
