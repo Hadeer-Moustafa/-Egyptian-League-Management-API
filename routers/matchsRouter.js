@@ -7,7 +7,7 @@ const allowedTo = require("../middleware/allowedTo");
 
 router.get("/", matchController.getAllMatchs);
 router.get("/:matchId", matchController.getMatchById);
-router.post("/",verifyToken,allowedTo(userRoles.MANEGER), matchController.addMatch);
+router.post("/",verifyToken,allowedTo(userRoles.MANEGER,userRoles.ADMIN), matchController.addMatch);
 router.patch("/:matchId",verifyToken,allowedTo(userRoles.ADMIN,userRoles.MANEGER), matchController.updateMatch);
 router.delete("/:matchId",verifyToken,allowedTo(userRoles.ADMIN,userRoles.MANEGER), matchController.deleteMatch);
 

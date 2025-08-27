@@ -26,6 +26,7 @@ const verifyToken = require("../middleware/verifytoken");
 const allowedTo = require("../middleware/allowedTo");
 const userRoles = require("../utilities/userRoles");
 const appError = require("../utilities/appError");
+const user = require("../models/user");
 
 router.get("/", teamsController.getAllTeams);
 router.get("/:teamId", teamsController.getTeamById);
@@ -33,7 +34,7 @@ router.post(
   "/",
   verifyToken,
   upload.single("logo"),
-  allowedTo(userRoles.MANEGER),
+  allowedTo(userRoles.MANEGER,userRoles.ADMIN),
   teamsController.addTeam
 );
 router.patch(
