@@ -10,7 +10,7 @@ const matchSchema = new mongoose.Schema({
   homeTeam: { type: String, required: true },
   awayTeam: { type: String, required: true },
   date: { type: String, required: true },
-  score: { type: Number, required: true },
+  score: { type: String, required: true },
 });
 
 const Team = mongoose.model("teams", teamSchema);
