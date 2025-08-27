@@ -33,7 +33,7 @@ Use Postman or any REST client to test the API.
 
 ### Auth Routes
 - **POST /api/users/register** → Register a new user  
-- **POST /api/auth/login** → Login and receive a JWT
+- **POST /api/users/login** → Login and receive a JWT
 
 ### User Routes
 - **GET /api/users** → Get all users (admin only)  
@@ -41,14 +41,14 @@ Use Postman or any REST client to test the API.
 ### Team Routes
 - **POST /api/teams** → Create a new team (admin/manager)  
 - **GET /api/teams** → Get all teams
-- **GET /api/teams/:id** → Get a team by ID   
+- **GET /api/teams/:id** → Get team by ID   
 - **PATCH /api/teams/:id** → Update team (admin/manager)  
 - **DELETE /api/teams/:id** → Delete team (admin/manager)  
 
 ### Match Routes
 - **POST /api/matches** → Create a new match (admin/manager)  
 - **GET /api/matches** → Get all matches
-- **GET /api/matches/:id** → Get a matche by ID  
+- **GET /api/matches/:id** → Get matche by ID  
 - **PUT /api/matches/:id** → Update match (admin/manager)  
 - **DELETE /api/matches/:id** → Delete match (admin/manager)  
 
