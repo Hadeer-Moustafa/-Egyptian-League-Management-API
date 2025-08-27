@@ -1,11 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const matchController = require("../controllers/matchs");
+const verifyToken = require("../middleware/verifytoken");
+const userRoles = require("../utilities/userRoles");
+const allowedTo = require("../middleware/allowedTo");
 
 router.get("/", matchController.getAllMatchs);
 router.get("/:matchId", matchController.getMatchById);
-router.post("/", matchController.addMatch);
-router.patch("/:matchId", matchController.updateMatch);
-router.delete("/:matchId", matchController.deleteMatch);
+router.post("/",verifyToken,allowedTo(userRoles.MANEGER), matchController.addMatch);
+router.patch("/:matchId",verifyToken,allowedTo(userRoles.ADMIN,userRoles.MANEGER), matchController.updateMatch);
+router.delete("/:matchId",verifyToken,allowedTo(userRoles.ADMIN,userRoles.MANEGER), matchController.deleteMatch);
 
 module.exports = router;

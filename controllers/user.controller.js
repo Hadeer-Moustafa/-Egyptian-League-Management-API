@@ -21,7 +21,7 @@ const getAllUsers = asyncWrapper(async (req, res) => {
 });
 
 const register = asyncWrapper(async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password,role } = req.body;
   const olduser = await User.findOne({ email: req.body.email });
   if (olduser) {
     return res
@@ -34,8 +34,9 @@ const register = asyncWrapper(async (req, res) => {
     lastName,
     email,
     password: hashedpassword,
+    role
   });
-  const token = await generate_jwt({ id: newUser._id, email: newUser.email });
+  const token = await generate_jwt({ id: newUser._id, email: newUser.email,role:newUser.role });
   newUser.token = token;
   await newUser.save();
   res.status(201).json({ status: SUCCESS, data: { user: newUser } });
@@ -52,7 +53,7 @@ const login = asyncWrapper(async (req, res) => {
   }
   const matchedPassword = await bycrypt.compare(password, user.password);
   if (user && matchedPassword) {
-    const token = await generate_jwt({ id: user._id, email: user.email });
+    const token = await generate_jwt({ id: user._id, email: user.email,role:user.role });
     return res.json({ status: SUCCESS, data: { token } });
   }
   throw AppError.create("error in email or password", 404, "Error");
