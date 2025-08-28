@@ -4,7 +4,7 @@ const verifyToken = require('../middleware/verifytoken');
 const allowedTo = require('../middleware/allowedTo');
 const userRoles = require('../utilities/userRoles');
 const router = express.Router();
-router.get('/',allowedTo(userRoles.ADMIN), verifyToken , user.getAllUsers);
+router.get('/', verifyToken ,allowedTo(userRoles.ADMIN) , user.getAllUsers);
 router.post('/register', user.register);
 router.post('/login', user.login);
 module.exports = router;
