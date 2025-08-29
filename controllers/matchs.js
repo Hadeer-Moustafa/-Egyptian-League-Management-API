@@ -29,6 +29,9 @@ const addMatch = asyncWrapper(async (req, res) => {
 });
 
 const updateMatch = asyncWrapper(async (req, res) => {
+ if(Object.keys(req.body).length===0){
+    throw AppError.create("no data provided to update", 400, "Fail");
+ }
   const data = await matchs.updateOne(
     { _id: req.params.matchId },
     { $set: req.body }
